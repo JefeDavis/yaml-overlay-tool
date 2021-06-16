@@ -1,4 +1,4 @@
-[Back to Table of contents](../index.md)  
+[Back to Table of contents](../index.md)
 
 
 ## Example CLI usage
@@ -27,7 +27,7 @@
 
 ### Use with an Instructions file
 
-YAML Overlay Tool's main intended use is with an [Instructions file](instructionsFileIntro.md).  
+YAML Overlay Tool's main intended use is with an [Instructions file](instructionsFileIntro.md).
 To use Yot with an Instructions file, simply provide the `-i` parameter followed by a path to the instructions.  Yot's default output path is `./output`.
 
 ```bash
@@ -64,7 +64,7 @@ yot -i < instructions file > -s | kubectl apply -f -
 
 #### Manipulating the output style
 
-By default, Yot outputs your YAML documents in the same style they started, and any changes going in to the documents will maintain their original style.  However, Yot has the ability to manipulate the final output style of your YAML documents with the `-S` parameter followed by the desired style option.  
+By default, Yot outputs your YAML documents in the same style they started, and any changes going in to the documents will maintain their original style.  However, Yot has the ability to manipulate the final output style of your YAML documents with the `-S` parameter followed by the desired style option.
 There are seven styles to choose from, all of which are considered valid YAML:
   * **Normal:** `n`, `normal`, `NORMAL`
   * **Tagged:** `t`, `tagged`, `tag`, `TAGGED`
@@ -110,8 +110,8 @@ yot -i < instructions file > -f /my/template/values1.yaml -f /my/template/values
 
 #### Obtain logging or debug information
 
-Yot has a logging facility to assist with debugging, and to determine what might be causing something to not work in the way the user expected.  
-To see the fully verbose logs when running Yot, pass only the `-v` parameter which is by default the debug logs.  
+Yot has a logging facility to assist with debugging, and to determine what might be causing something to not work in the way the user expected.
+To see the fully verbose logs when running Yot, pass only the `-v` parameter which is by default the debug logs.
 
 ```bash
 # default debug logs
@@ -137,11 +137,11 @@ yot -i < instructions file > -v=WARNING
 
 ### Use without an Instructions file
 
-Yot may also be used without an Instructions file, and behaves as a [`commonOverlay`](instructionsFileSpec.md#top-level-commonoverlays-keys) does (added in v0.5.0).  
+Yot may also be used without an Instructions file, and behaves as a [`commonOverlay`](instructionsFileSpec.md#top-level-commonoverlays-keys) does (added in v0.5.0).
 
 As of v0.5.0, an overlay can be applied purely from the CLI, and can be processed with or in combination with an instructions file.  [Overlay qualifiers](overlayQualifiers.md) are not supported via the CLI in v0.5.0.
 
-To process an overlay without an instructions file, a few parameters are required:  
+To process an overlay without an instructions file, a few parameters are required:
     * **Query:** `q`, `query`
     * **Action:** `a`, `action` ( default is merge)
     * **Value:** `x`, `value` (not required for action delete)
@@ -161,7 +161,7 @@ cat /path/to/yaml/files/*.yaml | yot -q metadata.labels -x "{app.kubernetes.io/o
 
 #### One-off overlay example in conjunction with an Instructions file
 
-An additional overlay can be added to be processed in addition to an Instructions file.  CLI based overlays are processed as if they were `commonOverlays`, and when specified in addition to an Instructions file they are always processed as the ***last*** `commonOverlay`.  
+An additional overlay can be added to be processed in addition to an Instructions file.  CLI based overlays are processed as if they were `commonOverlays`, and when specified in addition to an Instructions file they are always processed as the ***last*** `commonOverlay`.
 
 ```bash
 yot -i /path/to/my/instructions/file.yaml -q metadata.labels -x "{app.kubernetes.io/owner: Jeff Smith}" -a merge -p /path/to/source/yaml/file.yaml -o /tmp/new
@@ -176,5 +176,5 @@ yot env
 ```
 
 
-[Back to Table of contents](../index.md)  
+[Back to Table of contents](../index.md)
 [Next Up: Instructions file introduction](instructionsFileIntro.md)
