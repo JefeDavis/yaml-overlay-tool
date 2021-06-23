@@ -7,7 +7,8 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"os"
+	"net/http"
+	"net/url"
 	"path"
 
 	"github.com/spf13/viper"
@@ -82,9 +83,27 @@ func (yfs *YamlFiles) UnmarshalYAML(value *yaml.Node) error {
 }
 
 func (yf *YamlFile) readYamlFile() error {
-	reader, err := ReadStream(yf.Path)
+	u, err := url.Parse(yf.Path)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to parse uri %s, %w", u, err)
+	}
+
+	var reader io.ReadCloser
+
+	switch u.Scheme {
+	case "file", "":
+		reader, err = ReadStream(yf.Path)
+		if err != nil {
+			return err
+		}
+	case "http", "https":
+		resp, err := http.Get(yf.Path)
+		if err != nil {
+			return err
+		}
+		reader = resp.Body
+	default:
+		return fmt.Errorf("unable to handle scheme %s in path %s, %w", u.Scheme, u.String(), err)
 	}
 
 	dc := yaml.NewDecoder(reader)
@@ -93,7 +112,7 @@ func (yf *YamlFile) readYamlFile() error {
 		var y yaml.Node
 
 		if err := dc.Decode(&y); errors.Is(err, io.EOF) {
-			if reader, ok := reader.(*os.File); ok {
+			if reader, ok := reader.(io.ReadCloser); ok {
 				CloseFile(reader)
 			}
 
@@ -114,6 +133,18 @@ func (yfs *YamlFiles) expandDirectories() error {
 	var paths []string
 
 	for i := 0; i <= len(y)-1; i++ {
+		if y[i].Path == "-" {
+			continue
+		}
+
+		u, err := url.Parse(y[i].Path)
+		if err != nil {
+			return fmt.Errorf("failed to parse uri %s, %w", u, err)
+		} else if u.Scheme != "" && u.Scheme != "file" {
+			continue
+		}
+		y[i].Path = u.Host + u.Path
+
 		if !path.IsAbs(y[i].Path) {
 			y[i].Path = path.Join(viper.GetString("instructionsDir"), y[i].Path)
 		}

@@ -4,7 +4,6 @@
 package instructions
 
 import (
-	"bufio"
 	"fmt"
 	"io"
 	"os"
@@ -12,9 +11,9 @@ import (
 	"path/filepath"
 )
 
-func ReadStream(fileName string) (io.Reader, error) {
+func ReadStream(fileName string) (io.ReadCloser, error) {
 	if fileName == "-" {
-		return bufio.NewReader(os.Stdin), nil
+		return os.Stdin, nil
 	}
 
 	file, err := os.Open(fileName)
@@ -26,7 +25,7 @@ func ReadStream(fileName string) (io.Reader, error) {
 }
 
 // CloseFile safely closes a file handle.
-func CloseFile(file *os.File) {
+func CloseFile(file io.ReadCloser) {
 	if err := file.Close(); err != nil {
 		log.Errorf("error closing file!: %s", err)
 	}
