@@ -9,6 +9,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"regexp"
 	"strings"
 
 	"github.com/spf13/viper"
@@ -120,18 +121,22 @@ func (i *Instructions) setOutputPath() {
 	p := make([]string, 0, len(i.YamlFiles))
 
 	for _, yf := range i.YamlFiles {
+		schemeRe := regexp.MustCompile("^.*://")
+		strippedPath := schemeRe.ReplaceAllString(yf.Path, "")
 		if yf.Path != "-" {
-			p = append(p, yf.Path)
+			p = append(p, strippedPath)
 		}
 	}
 
 	pathPrefix := GetCommonPrefix(os.PathSeparator, p...)
 
 	for _, yf := range i.YamlFiles {
+		schemeRe := regexp.MustCompile("^.*://")
+		strippedPath := schemeRe.ReplaceAllString(yf.Path, "")
 		if yf.OutputPath == "" {
-			yf.OutputPath = strings.TrimPrefix(yf.Path, pathPrefix)
+			yf.OutputPath = strings.TrimPrefix(strippedPath, pathPrefix)
 		} else if path.Ext(yf.OutputPath) == "" {
-			yf.OutputPath = path.Join(yf.OutputPath, path.Base(yf.Path))
+			yf.OutputPath = path.Join(yf.OutputPath, path.Base(strippedPath))
 		}
 	}
 }
