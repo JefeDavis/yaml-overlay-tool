@@ -1,0 +1,159 @@
+{
+	"$id": "https://github.com/vmware-tanzu-labs/yaml-overlay-tool",
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"title": "JSON Schema for Yot, a yaml overlay tool",
+	"description": "a tool to assist with patching YAML files by using JSONPath to query YAML documents.",
+	"definitions": {
+		"overlay": {
+			"type": "object",
+			"additionalProperties": false,
+			"properties": {
+				"name": {
+					"type": "string",
+					"description": "An optional description of the change you are performing, and used for either on-screen output or self-documentation."
+					},
+				"query": {
+					"type": [
+						"string",
+						"array"
+					],
+					"description": "JSONPath query or JSONPath fully-qualified (dot-notation) path to value you would like to manipulate. If the `query` is not a fully-qualified path (such as a.b.c.d) and returns no matches, you need to specify the `onMissing` key."
+				},
+				"value": {
+					"description": "The desired value to take action with"
+				},
+				"action": {
+					"type": "string",
+					"description": "The action to take when the JSONPath expression is found in the YAML document.",
+					"enum": [
+						"merge",
+						"replace",
+						"delete",
+						"combine"
+					]
+				},
+				"onMissing": {
+					"type": "object",
+					"description": "",
+					"additionalProperties": false,
+					"properties": {
+						"injectPath": {
+							"type": "string",
+							"description": ""
+						},
+						"action": {
+							"type": "string",
+							"description": "",
+							"enum": [ "ignore", "inject" ]
+						}
+					}
+				},
+				"documentQuery": {
+					"type": "array",
+					"items": {
+						"conditions": {
+							"type": "object",
+							"description": "",
+							"additionalProperties": false,
+							"properties": {
+								"query": {},
+								"value": {}
+							}
+						}
+					}
+				},
+				"documentIndex": {
+					"type": ["array", "integer"],
+					"description": ""
+				}
+			},
+			"if": {
+				"not": {
+					"properties": { "action": { "const": "delete" } }
+				}
+			},
+			"then": {
+				"required": [ "query", "value" ]
+			},
+			"else": {
+				"required": [ "query" ]
+			}
+		},
+		"yamlFile": {
+			"type": "object",
+			"description": "",
+			"additionalProperties": false,
+			"properties": {
+				"name": {
+					"type": "string",
+					"description": ""
+				},
+				"path": {
+					"type": "string",
+					"description": ""
+				},
+				"overlays": {
+					"type": "array",
+					"description": "",
+					"items": {
+						"$ref": "#/definitions/overlay"
+					}
+				},
+				"outputPath": {
+					"type": "string",
+					"description": ""
+				},
+				"documents": {
+					"type": "array",
+					"description": "",
+					"items": {
+						"$ref": "#/definitions/document"
+					}
+				}
+			}
+		},
+		"document": {
+			"type": "object",
+			"description": "",
+			"additionalProperties": false,
+			"properties": {
+				"name": {
+					"type": "string",
+					"description": ""
+				},
+				"path": {
+					"type": "integer",
+					"description": ""
+				},
+				"overlays": {
+					"type": "array",
+					"description": "",
+					"items": {
+						"$ref": "#/definitions/overlay"
+					}
+				}
+			}
+		}
+	},
+	"type":"object",
+	"additionalProperties": false,
+	"properties": {
+		"commonOverlays": {
+			"type": "array",
+			"description": "provides overlays to apply to every item in the `yamlFiles` array (optional)",
+			"items": {
+				"$ref": "#/definitions/overlay"
+			}
+		},
+		"yamlFiles": {
+			"type": "array",
+			"description": "provides overlays to the yaml document listed in path",
+			"items": {
+				"$ref": "#/definitions/yamlFile"
+			}
+		}
+	},
+	"required": [
+		"yamlFiles"
+	]
+}
