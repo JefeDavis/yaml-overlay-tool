@@ -56,9 +56,16 @@
 							"description": "",
 							"additionalProperties": false,
 							"properties": {
-								"query": {},
-								"value": {}
-							}
+								"query": {
+									"type": "string",
+									"description": ""
+								},
+								"value": {
+									"type": "string",
+									"description": ""
+								}
+							},
+							"required": [ "query" ]
 						}
 					}
 				},
@@ -110,7 +117,8 @@
 						"$ref": "#/definitions/document"
 					}
 				}
-			}
+			},
+			"required": [ "path" ]
 		},
 		"document": {
 			"type": "object",
